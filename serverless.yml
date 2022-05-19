@@ -1,0 +1,26 @@
+service: invite-lambda-authoriser
+frameworkVersion: "3"
+
+custom:
+  secrets: ${file(secrets.json)}
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: ap-southeast-2
+  profile: serverless
+  environment:
+    PRIVATE_KEY: ${self:custom.secrets.PRIVATE_KEY}
+    PASS_PHRASE: ${self:custom.secrets.PASS_PHRASE}
+    AUTH_TOKEN_KEY: ${self:custom.secrets.AUTH_TOKEN_KEY}
+    AUTH_REDIRECT_KEY: ${self:custom.secrets.AUTH_REDIRECT_KEY}
+    REDIRECT_URL: ${self:custom.secrets.REDIRECT_URL}
+functions:
+  authoriseUser:
+    handler: handler.login
+    memorySize: 128
+    description: decrypt username and password, login to Cognito and return tokens
+    events:
+      - httpApi:
+          path: /login
+          method: post
